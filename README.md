@@ -9,7 +9,8 @@ A work in progress library that provides serialization and deserialization routi
 
 ## Installing
 
-```git clone https://github.com/Exaeta/rpnx-serial.git &&
+```
+git clone https://github.com/Exaeta/rpnx-serial.git &&
 mkdir rpnx-serial.build &&
 cd rpnx-serial.build &&
 cmake ../rpnx-serial &&
