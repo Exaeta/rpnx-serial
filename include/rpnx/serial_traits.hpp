@@ -607,7 +607,6 @@ namespace rpnx
 
       T get()
       {
-        if (!ready()) __builtin_unreachable();
         T t = a;
         reset();
         return t;
@@ -624,14 +623,12 @@ namespace rpnx
       template<typename It>
                          auto insert(It begin, It end) -> It
       {
-        if (ready()) __builtin_unreachable();
         auto it = begin;
         while (it != end && !ready())
           {
             insert(*it);
             it++;
           }
-        if (it != end && !ready()) __builtin_unreachable();
         return {it, ready()};
       }
   
