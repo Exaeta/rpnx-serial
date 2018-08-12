@@ -67,3 +67,11 @@ deserializing!
 example_object == example_object2
 
 ```
+## Notes
+
+When serializing values of type ```size_t```, ```ptrdiff_t```, and other variable width types, use the following functions:
+```
+rpnx::serial_traits<uintany>::serialize(...);
+rpnx::serial_traits<uintany>::deserialize(...);
+```
+Failure to do so could cause your objects to have different binary formats when read/written on different platforms.
