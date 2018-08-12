@@ -36,7 +36,7 @@ namespace rpnx
   };
 
   template <typename It>
-  auto extract_container(It const&from)
+  auto extract_container(It const&from) -> decltype(container_extractor<It>::extract(from))
   {
     return container_extractor<It>::extract(from);
   }
@@ -195,11 +195,8 @@ namespace rpnx
   template <typename T>
   class has_noarg_serial_size_helper
   {
-
-    template <typename C> static std::true_type test(decltype(static_cast<size_t(*)()>(serial_traits<T>::serial_size)));
     template <typename C> static std::false_type test(...);
-
-  
+    template <typename C> static std::true_type test(decltype(serial_traits<C>::serial_size()));
   public:
     using type = decltype(test<T>(0));
   };
@@ -1094,7 +1091,7 @@ namespace rpnx
   template <typename T>
   struct tuple_converter_type_helper
   {
-    using type = serial_traits<T>::async_deserialize;
+    using type = typename serial_traits<T>::async_deserialize;
   };
 
 
