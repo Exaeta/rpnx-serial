@@ -30,7 +30,6 @@ sudo make install
 #include <vector>
 #include <iterator>
 #include <bitset>
-
 int main()
 {
   using namespace rpnx;
@@ -42,7 +41,7 @@ int main()
   
   vector<uint8_t> data_vec;
     
-  serial_traits<decltype(example_object)>::serialize(example_object, back_inserter(data_vec));
+  serialize(example_object, back_inserter(data_vec));
   
   for (size_t i = 0; i < data_vec.size(); i++)
   {
@@ -54,7 +53,7 @@ int main()
   cout << "example_object " << ( example_object == example_object2 ? "==" : "!=" ) << " example_object2" << endl;
   
   cout << "deserializing!" << endl;
-  serial_traits<decltype(example_object2)>::deserialize(example_object2, data_vec.begin());
+  deserialize(example_object2, data_vec.begin());
   
   cout << "example_object " << ( example_object == example_object2 ? "==" : "!=" ) << " example_object2" << endl;
     
