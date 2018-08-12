@@ -28,6 +28,9 @@ namespace rpnx
   class uintany;
   class intany;
 
+  template <typename I>
+  struct big_endian{};
+
   template <typename It>
   class container_extractor
     : public It
@@ -129,7 +132,6 @@ namespace rpnx
       return 0;
     }
   };
-
 
 
 
@@ -1186,6 +1188,47 @@ namespace rpnx
     using type = typename serial_traits<T>::async_deserialize;
   };
 
+  template <typename I>
+  struct serial_traits< big_endian<I>, 0 >
+  {
+    template <typename It>
+    static auto serialize(I const & num, It out) -> It
+    {
+      I copy = num;
+      
+      for (size_t i = 0; i < sizeof(I); i++)
+      {
+        *out = 0xFF & (copy >> ((sizeof(I) - i - 1)*8));
+        ++out;
+      }
+      return out;
+    }
+    
+    template <typename It>
+    static auto deserialize(I & out, It in) -> It
+    {
+      I fout = 0;
+      for (size_t i = 0; i < sizeof(I); i++)
+      {
+        fout <<= 8;
+        fout |= static_cast<uint8_t>(*in);
+        ++in;
+      }
+      
+      return in;
+    }
+    
+    static size_t serial_size(I const &)
+    {
+      return sizeof(I);
+    }
+    
+    static size_t serial_size()
+    {
+      return sizeof(I);
+    }
+  };
+
 
   // The following code requires serial_size to actually be implemented for all classes (it's not)
   /*
@@ -1214,6 +1257,9 @@ namespace rpnx
   {
     return serial_helper<T, It>::deserialize(out, in);
   }
+  
+  
+  
 
 }
 #endif
