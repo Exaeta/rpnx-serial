@@ -98,6 +98,7 @@ namespace rpnx
     5 - map-like
     6 - string-like
     7 - reference
+    8 - set-like
 
   */
   template <typename T>
@@ -142,13 +143,25 @@ namespace rpnx
   struct serial_traits_base_cases<std::array<Ts, N>>
   {
     static constexpr int base_case() { return 4; }
-  }
-    ;
+  };
 
   template <typename ... Ts>
   struct serial_traits_base_cases<std::pair<Ts...>>
   {
     static constexpr int base_case() { return 4; }
+  };
+  
+  
+  template <typename ... Ts>
+  struct serial_traits_base_cases<std::unordered_set<Ts...>>
+  {
+    static constexpr int base_case() { return 8; }
+  };
+  
+  template <typename ... Ts>
+  struct serial_traits_base_cases<std::set<Ts...>>
+  {
+    static constexpr int base_case() { return 8; }
   };
 
   template <typename ... Ts>
@@ -863,6 +876,35 @@ namespace rpnx
       }
     };
   };
+  
+  template <typename T, bool S1 = has_noarg_serial_size<typename T::key_type>::value>
+  struct set_size_helper;
+
+  template <typename T>
+  struct set_size_helper<T, false>
+  {
+    static size_t serial_size(T const & what)
+    {
+      size_t sz = 0;
+      for (auto it = what.begin(); it != what.end(); it++)
+        {
+          sz += serial_traits<typename T::value_type>::serial_size(*it);
+        }
+      return sz;
+    
+    }
+  };
+
+  template <typename T>
+  struct set_size_helper<T, true>
+  {
+    static size_t serial_size(T const & what)
+    {
+      size_t sz = 0;
+      sz += serial_traits<typename T::value_type>::serial_size()*what.size();
+      return sz;    
+    }
+  };
 
 
   template <typename T, bool S1 = has_noarg_serial_size<typename T::key_type>::value, bool S2 = has_noarg_serial_size<typename T::mapped_type>::value>
@@ -929,6 +971,53 @@ namespace rpnx
       sz += what.size()*serial_traits<typename T::key_type>::serial_size();
       return sz;
 
+    }
+  };
+
+  template <typename T>
+  struct serial_traits<T, 8>
+  {
+    static void dev_test()  { std::cout << "serial_traits(set)" << std::endl; }
+
+  private:
+
+  
+  public:
+    static size_t serial_size(T const & what)
+    {
+      size_t sz = serial_traits<uintany>::serial_size(what.size());
+      sz += set_size_helper< T >::serial_size(what);
+      return sz;
+    }
+  
+    static constexpr bool serial_size_constexpr() { return false; }
+    template <typename It>
+    static auto serialize(T const & in, It out) -> It
+    {
+      out = serial_traits<uintany>::serialize(in.size(), out);
+
+      for (auto it = begin(in); it != end(in); it++)
+        {
+          out = serial_traits<typename T::value_type>::serialize(*it, out);
+        }
+    
+      return out;
+    }
+
+    template <typename It>
+    static auto deserialize(T & out, It in) -> It
+    {
+      out.clear();
+      size_t sz = 0;
+      in = serial_traits<uintany>::deserialize(sz, in);
+
+      for (size_t i = 0; i < sz; i++)
+        {
+          typename T::value_type iv;
+          in = serial_traits<decltype(iv)>::deserialize(iv, in);
+          out.insert(std::move(iv));
+        }
+      return in;
     }
   };
 
