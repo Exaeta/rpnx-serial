@@ -75,3 +75,5 @@ rpnx::serial_traits<uintany>::serialize(...);
 rpnx::serial_traits<uintany>::deserialize(...);
 ```
 Failure to do so could cause your objects to have different binary formats when read/written on different platforms.
+
+The deserializer does NOT perform bounds checking. Use a bounds checked iterator.
