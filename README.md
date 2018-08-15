@@ -86,19 +86,19 @@ The relevant overloads will be:
 
 
 ```C++
-static constexpr size_t rpnx::serial_traits<T>::size();
+static constexpr size_t rpnx::serial_size<T>();
 ```
 Returns the serial size. This member function is only present on types with fixed serial sizes. (e.g., uint64_t)
 
 
 ```C++
-static constexpr size_t rpnx::serial_traits<T>::size(T const & t);
+static constexpr size_t rpnx::serial_size<T>(T const & t);
 ```
 Returns what the serialized size of the object ```t``` would be.
 
 
 ```C++
-/*(1)*/ static constexpr auto rpnx::serial_traits<T, ItF>::serialize(ItF && f, T const & t)->decltype(f());
+/*(1)*/ static constexpr auto rpnx::serialize(ItF && f, T const & t)->decltype(f());
 
 ```
 Serialization functions.
@@ -109,7 +109,7 @@ Function ```(1)``` expects ```f(n)``` to be callable as though it was of type ``
 Function ```(2)``` expects an Output Iterator. You *must* ensure that the output iterator can accomodate the full size of the data structure. You could either check the serial size of the structure in advance, which will be exactly ```rpnx::serial_traits<T>::size(t)``` bytes, or you could use e.g. a ```std::back_insert_iterator<...>```</s>
 
 ```C++
-/*(1)*/ static constexpr auto rpnx::serial_traits<T, ItF>::deserialize(ItF && f, T & t)->decltype(f());
+/*(1)*/ static constexpr auto rpnx::deserialize(ItF && f, T & t)->decltype(f());
 ```
 Functions for deserializing objects.
 
@@ -176,8 +176,6 @@ class rpnx::serial_iterator_traits<T, It>
         SAFE:
           * deserializing a fixed serial size type such std::tuple<uint64_t, uint64_t> when you know the 
             input buffer is 16 bytes long.
-          * deserializing anything to a valid std::back_insert_iterator<...>
-          * deserializing anything to a valid rpnx::checked_iterator<...>
           * deserializing something that will be exactly N bytes to an iterator you received as the result
             of a call to f(N) from the argument to deserialize(ItF && f, T const & t)
           
