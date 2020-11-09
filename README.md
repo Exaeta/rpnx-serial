@@ -1,3 +1,9 @@
+# Abandoned
+
+Repo is abandoned in favor of rpnx-core. No further updates will be made.
+
+https://github.com/rnichollx/rpnx-core
+
 # rpnx::serial_traits
 
 A work in progress library that provides serialization and deserialization routines for common types.
