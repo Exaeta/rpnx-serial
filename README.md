@@ -2,7 +2,7 @@
 
 Repo is abandoned in favor of rpnx-core. No further updates will be made.
 
-https://github.com/rnichollx/rpnx-core
+https://github.com/rpnx-net/rpnx-core
 
 # rpnx::serial_traits
 
